@@ -1,0 +1,57 @@
+name: Auto grade Assignment
+
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        required: false
+        default: ".hyf"
+        type: string
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+
+    steps:
+      # Checkout the trainee's assignment code
+      - name: Checkout assignment code
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: assignment
+
+      # Checkout the grading workflow scripts
+      - name: Checkout workflow scripts
+        uses: actions/checkout@v6
+        with:
+          repository: HackYourFuture/github-actions
+          path: workflow-scripts
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "lts/*"
+
+      # Run the tests from the assignment directory
+      - name: Run tests
+        working-directory: assignment/${{ inputs.working-directory }}
+        run: bash test.sh > test-output.txt 2>&1
+
+      # Post the test results as a comment on the PR
+      - name: Comment PR
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const run = require('./workflow-scripts/comment-pr.js');
+            process.chdir('assignment');
+            await run({ github, context, core });
+
+      - name: Fail if tests failed
+        run: |
+          PASS=$(jq -r '.pass' assignment/${{ inputs.working-directory }}/score.json)
+          if [ "$PASS" != "true" ]; then
+            exit 1
+          fi
