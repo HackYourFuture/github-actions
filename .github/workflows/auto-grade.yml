@@ -45,8 +45,9 @@ jobs:
         uses: actions/github-script@v8
         with:
           script: |
-            const run = require('./workflow-scripts/comment-pr.js');
-            process.chdir('assignment');
+            const path = require('path');
+            const run = require(path.join(process.env.GITHUB_WORKSPACE, 'workflow-scripts/workflow-scripts/comment-pr.js'));
+            process.chdir(path.join(process.env.GITHUB_WORKSPACE, 'assignment'));
             await run({ github, context, core });
 
       - name: Fail if tests failed
