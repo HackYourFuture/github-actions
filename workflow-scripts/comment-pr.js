@@ -33,11 +33,11 @@ module.exports = async function run({ github, context, core }) {
 
   const { score, passingScore, pass, output } = testResults;
   const icon = pass ? '✅' : '❌';
-  const status = pass ? `${icon} Passed` : `${icon} Failed`;
+  const status = pass ? `${icon} Passed` : `${icon} Not passed`;
 
   // Clean, well-formatted markdown body (no stray indentation or spacing)
   const body = `## 📝 HackYourFuture auto grade
-  ### Assignment Score: ${score} / ${passingScore} ${icon}
+  ### Assignment Score: ${score} / 100 ${icon}
 **Status:** ${status}
 **Minimum score to pass:** ${passingScore}
 *🧪 The auto grade is experimental and still being improved*
