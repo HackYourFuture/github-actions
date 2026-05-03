@@ -12,6 +12,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     permissions:
+      contents: read       # actions/checkout needs this for private repos
       pull-requests: write
       issues: write
 
