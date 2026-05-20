@@ -19,20 +19,20 @@ jobs:
     steps:
       # Checkout the trainee's assignment code
       - name: Checkout assignment code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           path: assignment
 
       # Checkout the grading workflow scripts
       - name: Checkout workflow scripts
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           repository: HackYourFuture/github-actions
           path: workflow-scripts
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version: "lts/*"
 
