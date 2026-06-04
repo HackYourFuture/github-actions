@@ -14,8 +14,10 @@ const getTestResults = () => {
   const score = String(scoreJson.score ?? '0');
   const passingScore = String(scoreJson.passingScore ?? '100');
   const pass = Boolean(scoreJson.pass);
+  const functionalTests = scoreJson.functional_tests ?? null;
+  const aiAssistPresent = scoreJson.ai_assist_present ?? null;
   const output = fs.readFileSync(outputPath, 'utf8');
-  return { score, passingScore, pass, output };
+  return { score, passingScore, pass, functionalTests, aiAssistPresent, output };
 }
 
 module.exports = async function run({ github, context, core }) {
@@ -31,16 +33,23 @@ module.exports = async function run({ github, context, core }) {
     return;
   }
 
-  const { score, passingScore, pass, output } = testResults;
+  const { score, passingScore, pass, functionalTests, aiAssistPresent, output } = testResults;
   const icon = pass ? '✅' : '❌';
   const status = pass ? `${icon} Passed` : `${icon} Not passed`;
+
+  const functionalTestsLine = functionalTests && functionalTests !== 'not run'
+    ? `**Functional tests:** ${functionalTests}\n`
+    : '';
+  const aiAssistLine = aiAssistPresent !== null
+    ? `**AI_ASSIST.md present:** ${aiAssistPresent ? 'yes ✅' : 'no ❌'}\n`
+    : '';
 
   // Clean, well-formatted markdown body (no stray indentation or spacing)
   const body = `## 📝 HackYourFuture auto grade
   ### Assignment Score: ${score} / 100 ${icon}
 **Status:** ${status}
 **Minimum score to pass:** ${passingScore}
-*🧪 The auto grade is experimental and still being improved*
+${functionalTestsLine}${aiAssistLine}*🧪 The auto grade is experimental and still being improved*
 <details>
 <summary>Test Details</summary>
 
