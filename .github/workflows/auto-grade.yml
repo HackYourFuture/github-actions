@@ -17,12 +17,21 @@ jobs:
       issues: write
 
     steps:
-      # Checkout the trainee's assignment code
+      # Checkout the trainee's assignment code (fork PR head).
+      # pull_request_target is required so we can comment scores on fork PRs.
+      # actions/checkout v6+ refuses fork checkouts here unless we opt in.
+      # We intentionally execute the student's .hyf/test.sh next; keep the
+      # GITHUB_TOKEN least-privilege (contents:read, no extra secrets) and
+      # do not persist credentials into the student tree.
+      # See https://gh.io/securely-using-pull_request_target
       - name: Checkout assignment code
         uses: actions/checkout@v6
         with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.sha }}
           path: assignment
+          persist-credentials: false
+          allow-unsafe-pr-checkout: true
 
       # Checkout the grading workflow scripts
       - name: Checkout workflow scripts
